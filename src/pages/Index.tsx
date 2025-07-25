@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import { Package, FileBox, Users } from "lucide-react";
+import { Package, FileBox, Users, TreePine, Grid3X3 } from "lucide-react";
 
 const Index = () => {
   return (
@@ -10,7 +10,7 @@ const Index = () => {
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4">Serial Assignment System</h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            A high-density interface for managing serial assignments with modern selection interactions and drag-and-drop functionality.
+            Complete serial management solution with hierarchical ASN structure, high-density assignment interface, and advanced tracking capabilities.
           </p>
         </div>
 
@@ -52,11 +52,17 @@ const Index = () => {
           </Card>
         </div>
 
-        <div className="text-center">
-          <Link to="/serials">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link to="/asn">
             <Button size="lg" className="gap-2">
-              <Package className="w-5 h-5" />
-              View Serial Assignment Interface
+              <TreePine className="w-5 h-5" />
+              ASN Hierarchy View
+            </Button>
+          </Link>
+          <Link to="/serials">
+            <Button size="lg" variant="outline" className="gap-2">
+              <Grid3X3 className="w-5 h-5" />
+              Serial Grid View
             </Button>
           </Link>
         </div>
