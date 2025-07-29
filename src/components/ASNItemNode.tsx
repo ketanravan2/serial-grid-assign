@@ -36,6 +36,7 @@ export const ASNItemNode: React.FC<ASNItemNodeProps> = ({
       type: 'item',
       targetId: item.id,
       targetName: item.name,
+      buyerPartNumber: item.buyerPartNumber,
       isTemporary: hasLots,
       warning: hasLots 
         ? 'This item has lots. Assignment at item level is temporary. Consider assigning at lot level instead.'
@@ -49,6 +50,7 @@ export const ASNItemNode: React.FC<ASNItemNodeProps> = ({
       type: 'lot',
       targetId: lot.id,
       targetName: `${item.name} - ${lot.number}`,
+      buyerPartNumber: lot.buyerPartNumber,
     };
     onAssignSerials(context);
   };

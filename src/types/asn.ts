@@ -2,6 +2,7 @@ export interface ASNItem {
   id: string;
   name: string;
   partNumber: string;
+  buyerPartNumber: string;
   description?: string;
   lots: ASNLot[];
   totalSerials: number;
@@ -12,6 +13,7 @@ export interface ASNLot {
   id: string;
   number: string;
   itemId: string;
+  buyerPartNumber: string;
   description?: string;
   totalSerials: number;
   assignedSerials: number;
@@ -38,6 +40,7 @@ export interface AssignmentContext {
   type: 'item' | 'lot' | 'pack';
   targetId: string;
   targetName: string;
+  buyerPartNumber?: string;
   allowedSerials?: string[];
   isTemporary?: boolean;
   warning?: string;

@@ -63,14 +63,8 @@ export const ASNHierarchyView: React.FC<ASNHierarchyViewProps> = ({
     }
     
     // Add buyer part number filter if available
-    if (context.type === 'item' || context.type === 'lot') {
-      const item = hierarchy.items.find(item => 
-        item.id === context.targetId || 
-        item.lots.some(lot => lot.id === context.targetId)
-      );
-      if (item?.partNumber) {
-        params.set('buyerPartNumber', item.partNumber);
-      }
+    if (context.buyerPartNumber) {
+      params.set('buyerPartNumber', context.buyerPartNumber);
     }
     
     window.location.href = `/assignment?${params.toString()}`;
