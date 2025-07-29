@@ -16,12 +16,14 @@ interface SerialAssignmentInterfaceProps {
   serials: Serial[];
   onAssignSerials: (serialIds: string[], targetId: string, targetType: 'item' | 'lot' | 'package') => void;
   className?: string;
+  hideAssignmentDialog?: boolean;
 }
 
 export const SerialAssignmentInterface: React.FC<SerialAssignmentInterfaceProps> = ({
   serials,
   onAssignSerials,
   className,
+  hideAssignmentDialog = false,
 }) => {
   const { toast } = useToast();
   
@@ -261,13 +263,15 @@ export const SerialAssignmentInterface: React.FC<SerialAssignmentInterfaceProps>
       />
 
       {/* Assignment dialog */}
-      <AssignmentDialog
-        open={assignmentDialog.open}
-        onOpenChange={(open) => setAssignmentDialog({ open, type: null })}
-        selectedSerials={Array.from(selectedSerials)}
-        assignmentType={assignmentDialog.type}
-        onAssign={handleAssignment}
-      />
+      {!hideAssignmentDialog && (
+        <AssignmentDialog
+          open={assignmentDialog.open}
+          onOpenChange={(open) => setAssignmentDialog({ open, type: null })}
+          selectedSerials={Array.from(selectedSerials)}
+          assignmentType={assignmentDialog.type}
+          onAssign={handleAssignment}
+        />
+      )}
     </div>
   );
 };

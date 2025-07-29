@@ -51,40 +51,39 @@ export const ASNHierarchyView: React.FC<ASNHierarchyViewProps> = ({
   const assignmentRate = totalSerials > 0 ? (assignedSerials / totalSerials) * 100 : 0;
 
   const handleAssignmentRequest = (context: AssignmentContext) => {
-    setAssignmentDialog({ open: true, context });
-  };
-
-  const handleAssignmentComplete = (serialIds: string[], context: AssignmentContext) => {
-    // Determine target type for the callback
-    let targetType: string;
-    switch (context.type) {
-      case 'item':
-        targetType = 'item';
-        break;
-      case 'lot':
-        targetType = 'lot';
-        break;
-      case 'pack':
-        targetType = 'package';
-        break;
-    }
-
-    onAssignSerials(serialIds, context.targetId, targetType, context.isTemporary);
-    
-    const assignmentType = context.isTemporary ? 'temporary assignment' : 'assignment';
-    toast({
-      title: "Assignment successful",
-      description: `${serialIds.length} serial${serialIds.length !== 1 ? 's' : ''} ${assignmentType} to ${context.targetName}.`,
+    // Navigate to assignment page with context
+    const params = new URLSearchParams({
+      type: context.type,
+      targetId: context.targetId,
+      targetName: context.targetName,
     });
+    
+    if (context.isTemporary) {
+      params.set('temporary', 'true');
+    }
+    
+    // Add buyer part number filter if available
+    if (context.type === 'item' || context.type === 'lot') {
+      const item = hierarchy.items.find(item => 
+        item.id === context.targetId || 
+        item.lots.some(lot => lot.id === context.targetId)
+      );
+      if (item?.partNumber) {
+        params.set('buyerPartNumber', item.partNumber);
+      }
+    }
+    
+    window.location.href = `/assignment?${params.toString()}`;
   };
 
   const handleGlobalPackAssignment = () => {
-    const context: AssignmentContext = {
+    const params = new URLSearchParams({
       type: 'pack',
       targetId: 'global-pack',
-      targetName: 'Available Packaging',
-    };
-    setAssignmentDialog({ open: true, context });
+      targetName: 'Global Package Assignment',
+    });
+    
+    window.location.href = `/assignment?${params.toString()}`;
   };
 
   return (
@@ -186,14 +185,6 @@ export const ASNHierarchyView: React.FC<ASNHierarchyViewProps> = ({
         </TabsContent>
       </Tabs>
 
-      {/* Enhanced Assignment Dialog */}
-      <EnhancedAssignmentDialog
-        open={assignmentDialog.open}
-        onOpenChange={(open) => setAssignmentDialog({ open, context: null })}
-        context={assignmentDialog.context}
-        serials={serials}
-        onAssign={handleAssignmentComplete}
-      />
     </div>
   );
 };

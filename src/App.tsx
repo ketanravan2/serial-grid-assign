@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Serials from "./pages/Serials";
 import ASN from "./pages/ASN";
+import Assignment from "./pages/Assignment";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,6 +21,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/serials" element={<Serials />} />
           <Route path="/asn" element={<ASN />} />
+          <Route path="/assignment" element={<Assignment />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

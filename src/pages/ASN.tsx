@@ -1,46 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { ASNHierarchyView } from '@/components/ASNHierarchyView';
 import { SerialAssignmentInterface } from '@/components/SerialAssignmentInterface';
-import { mockASNHierarchy } from '@/data/asnMockData';
-import { mockSerials } from '@/data/mockData';
-import { Serial } from '@/types/serial';
+import { useAppState } from '@/contexts/AppStateContext';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TreePine, Grid3X3, BarChart3 } from 'lucide-react';
 
 const ASN: React.FC = () => {
-  const { toast } = useToast();
-  const [serials, setSerials] = useState<Serial[]>(mockSerials);
-
-  const handleAssignSerials = (
-    serialIds: string[], 
-    targetId: string, 
-    targetType: 'item' | 'lot' | 'package',
-    isTemporary?: boolean
-  ) => {
-    // Update the serials with assignment information
-    setSerials(prevSerials =>
-      prevSerials.map(serial =>
-        serialIds.includes(serial.id)
-          ? {
-              ...serial,
-              status: isTemporary ? 'reserved' as const : 'assigned' as const,
-              assignedTo: targetId,
-              assignedToType: targetType,
-              updatedAt: new Date(),
-            }
-          : serial
-      )
-    );
-
-    // Show success message
-    const assignmentType = isTemporary ? 'temporary assignment' : 'assignment';
-    toast({
-      title: "Assignment successful",
-      description: `${serialIds.length} serial${serialIds.length !== 1 ? 's' : ''} ${assignmentType} completed.`,
-    });
-  };
+  const { serials, asnHierarchy, assignSerials } = useAppState();
 
   const assignedCount = serials.filter(s => s.status !== 'unassigned').length;
   const assignmentRate = serials.length > 0 ? (assignedCount / serials.length) * 100 : 0;
@@ -60,7 +28,7 @@ const ASN: React.FC = () => {
               <span>•</span>
               <span>{assignedCount} assigned ({assignmentRate.toFixed(1)}%)</span>
               <span>•</span>
-              <span>{mockASNHierarchy.items.length} items with {mockASNHierarchy.items.reduce((sum, item) => sum + item.lots.length, 0)} lots</span>
+              <span>{asnHierarchy.items.length} items with {asnHierarchy.items.reduce((sum, item) => sum + item.lots.length, 0)} lots</span>
             </div>
           </CardHeader>
         </Card>
@@ -80,16 +48,16 @@ const ASN: React.FC = () => {
           
           <TabsContent value="hierarchy" className="mt-6">
             <ASNHierarchyView
-              hierarchy={mockASNHierarchy}
+              hierarchy={asnHierarchy}
               serials={serials}
-              onAssignSerials={handleAssignSerials}
+              onAssignSerials={assignSerials}
             />
           </TabsContent>
           
           <TabsContent value="serials" className="mt-6">
             <SerialAssignmentInterface
               serials={serials}
-              onAssignSerials={handleAssignSerials}
+              onAssignSerials={assignSerials}
             />
           </TabsContent>
         </Tabs>
