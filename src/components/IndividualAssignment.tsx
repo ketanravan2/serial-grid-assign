@@ -5,10 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { SerialAssignmentInterface } from './SerialAssignmentInterface';
-import { Package, Box, Container } from 'lucide-react';
+import { Package, Box, Container, Plus, AlertTriangle } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 export const IndividualAssignment: React.FC = () => {
   const { serials, asnHierarchy, assignSerials } = useAppState();
+  const { toast } = useToast();
   const [assignmentType, setAssignmentType] = useState<'items' | 'package'>('items');
   const [selectedItem, setSelectedItem] = useState<string>('');
   const [selectedLot, setSelectedLot] = useState<string>('');
@@ -63,7 +65,35 @@ export const IndividualAssignment: React.FC = () => {
       actualTargetType = 'package';
     }
 
+    // Check for overassignment
+    const targetSerials = getTargetSerials(actualTargetId, actualTargetType);
+    const availableCapacity = getAvailableCapacity(actualTargetId, actualTargetType);
+    
+    if (availableCapacity !== null && serialIds.length > availableCapacity) {
+      toast({
+        title: "Overassignment Warning",
+        description: `You're trying to assign ${serialIds.length} serials but only ${availableCapacity} slots are available.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     assignSerials(serialIds, actualTargetId, actualTargetType);
+  };
+
+  const getTargetSerials = (targetId: string, targetType: 'item' | 'lot' | 'package') => {
+    return serials.filter(s => s.assignedTo === targetId && s.assignedToType === targetType);
+  };
+
+  const getAvailableCapacity = (targetId: string, targetType: 'item' | 'lot' | 'package') => {
+    if (targetType === 'lot') {
+      const lot = availableLots.find(l => l.id === targetId);
+      if (lot) {
+        const assignedCount = getTargetSerials(targetId, targetType).length;
+        return lot.serialCount - assignedCount;
+      }
+    }
+    return null; // No capacity limit for items and packages
   };
 
   const getAssignmentContext = () => {
@@ -116,6 +146,22 @@ export const IndividualAssignment: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Actions row */}
+          <div className="flex flex-wrap gap-2 mb-4">
+            <Button size="sm" variant="outline" className="gap-2">
+              <Plus className="w-4 h-4" />
+              Create Serial
+            </Button>
+            <Button size="sm" variant="outline" className="gap-2">
+              <Plus className="w-4 h-4" />
+              Bulk Create
+            </Button>
+            <Button size="sm" variant="outline" className="gap-2">
+              <Plus className="w-4 h-4" />
+              Import CSV
+            </Button>
+          </div>
+
           <div className="space-y-2">
             <Label>Assignment Level</Label>
             <Select value={assignmentType} onValueChange={(value: 'items' | 'package') => {
@@ -161,10 +207,10 @@ export const IndividualAssignment: React.FC = () => {
 
               {selectedItem && availableLots.length > 0 && (
                 <div className="space-y-2">
-                  <Label>Lot Number (Optional)</Label>
+                  <Label>Lot Number</Label>
                   <Select value={selectedLot} onValueChange={setSelectedLot}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select lot (optional)" />
+                      <SelectValue placeholder="Select lot" />
                     </SelectTrigger>
                     <SelectContent>
                       {availableLots.map((lot) => (

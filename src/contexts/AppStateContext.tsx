@@ -37,9 +37,10 @@ export const AppStateProvider: React.FC<{ children: ReactNode }> = ({ children }
         serialIds.includes(serial.id)
           ? {
               ...serial,
-              status: isTemporary ? 'reserved' as const : 'assigned' as const,
-              assignedTo: targetId,
-              assignedToType: targetType,
+              status: targetId === '' ? 'unassigned' as const : 
+                     (isTemporary ? 'reserved' as const : 'assigned' as const),
+              assignedTo: targetId === '' ? undefined : targetId,
+              assignedToType: targetId === '' ? undefined : targetType,
               updatedAt: new Date(),
             }
           : serial

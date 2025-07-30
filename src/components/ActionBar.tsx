@@ -11,6 +11,7 @@ interface ActionBarProps {
   onAssignToLot?: () => void;
   onAssignToPackage?: () => void;
   onAssign?: () => void;
+  onUnassign?: () => void;
   onClearSelection: () => void;
   className?: string;
   mode?: 'full' | 'simple';
@@ -22,6 +23,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
   onAssignToLot,
   onAssignToPackage,
   onAssign,
+  onUnassign,
   onClearSelection,
   className,
   mode = 'full',
@@ -46,9 +48,18 @@ export const ActionBar: React.FC<ActionBarProps> = ({
       {/* Action buttons */}
       <div className="flex items-center gap-2">
         {mode === 'simple' ? (
-          <Button size="sm" onClick={onAssign} className="gap-2">
-            Assign
-          </Button>
+          <>
+            {onAssign && (
+              <Button size="sm" onClick={onAssign} className="gap-2">
+                Assign
+              </Button>
+            )}
+            {onUnassign && (
+              <Button size="sm" variant="outline" onClick={onUnassign} className="gap-2">
+                Unassign
+              </Button>
+            )}
+          </>
         ) : (
           <>
             <Button

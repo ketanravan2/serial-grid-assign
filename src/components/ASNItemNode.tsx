@@ -87,7 +87,7 @@ export const ASNItemNode: React.FC<ASNItemNodeProps> = ({
                 className="gap-1"
               >
                 <Plus className="w-3 h-3" />
-                Assign
+                Manage Serials
                 {hasLots && <AlertTriangle className="w-3 h-3 text-amber-500" />}
               </Button>
             </div>
@@ -138,7 +138,7 @@ export const ASNItemNode: React.FC<ASNItemNodeProps> = ({
                             className="gap-1"
                           >
                             <Plus className="w-3 h-3" />
-                            Assign
+                            Manage Serials
                           </Button>
                         </div>
                       </div>
