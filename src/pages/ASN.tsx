@@ -1,11 +1,12 @@
 import React from 'react';
 import { ASNHierarchyView } from '@/components/ASNHierarchyView';
 import { SerialAssignmentInterface } from '@/components/SerialAssignmentInterface';
+import { IndividualAssignment } from '@/components/IndividualAssignment';
 import { useAppState } from '@/contexts/AppStateContext';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { TreePine, Grid3X3, BarChart3 } from 'lucide-react';
+import { TreePine, Grid3X3, BarChart3, Target } from 'lucide-react';
 
 const ASN: React.FC = () => {
   const { serials, asnHierarchy, assignSerials } = useAppState();
@@ -35,7 +36,7 @@ const ASN: React.FC = () => {
 
         {/* Main Interface */}
         <Tabs defaultValue="hierarchy" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="hierarchy" className="gap-2">
               <TreePine className="w-4 h-4" />
               ASN Hierarchy
@@ -43,6 +44,10 @@ const ASN: React.FC = () => {
             <TabsTrigger value="serials" className="gap-2">
               <Grid3X3 className="w-4 h-4" />
               Serial Grid View
+            </TabsTrigger>
+            <TabsTrigger value="individual" className="gap-2">
+              <Target className="w-4 h-4" />
+              Individual Assignment
             </TabsTrigger>
           </TabsList>
           
@@ -59,6 +64,10 @@ const ASN: React.FC = () => {
               serials={serials}
               onAssignSerials={assignSerials}
             />
+          </TabsContent>
+          
+          <TabsContent value="individual" className="mt-6">
+            <IndividualAssignment />
           </TabsContent>
         </Tabs>
       </div>

@@ -17,6 +17,14 @@ interface SerialAssignmentInterfaceProps {
   onAssignSerials: (serialIds: string[], targetId: string, targetType: 'item' | 'lot' | 'package') => void;
   className?: string;
   hideAssignmentDialog?: boolean;
+  assignmentMode?: 'full' | 'simple';
+  assignmentContext?: {
+    type: 'item' | 'lot' | 'pack';
+    targetId: string;
+    targetName: string;
+    buyerPartNumber?: string;
+    isTemporary?: boolean;
+  };
 }
 
 export const SerialAssignmentInterface: React.FC<SerialAssignmentInterfaceProps> = ({
@@ -24,6 +32,8 @@ export const SerialAssignmentInterface: React.FC<SerialAssignmentInterfaceProps>
   onAssignSerials,
   className,
   hideAssignmentDialog = false,
+  assignmentMode = 'full',
+  assignmentContext,
 }) => {
   const { toast } = useToast();
   
@@ -124,6 +134,22 @@ export const SerialAssignmentInterface: React.FC<SerialAssignmentInterfaceProps>
     setSelectedSerials(new Set());
     setLastSelectedIndex(null);
   }, [selectedSerials, onAssignSerials, toast]);
+
+  const handleSimpleAssignment = useCallback(() => {
+    if (selectedSerials.size === 0 || !assignmentContext) return;
+    
+    const targetType = assignmentContext.type === 'pack' ? 'package' : assignmentContext.type;
+    const serialIds = Array.from(selectedSerials);
+    onAssignSerials(serialIds, assignmentContext.targetId, targetType);
+    
+    toast({
+      title: "Assignment successful",
+      description: `${serialIds.length} serial${serialIds.length !== 1 ? 's' : ''} assigned to ${assignmentContext.targetName}.`,
+    });
+    
+    setSelectedSerials(new Set());
+    setLastSelectedIndex(null);
+  }, [selectedSerials, assignmentContext, onAssignSerials, toast]);
 
   // Drag and drop handlers
   const handleDragStart = useCallback((event: React.DragEvent) => {
@@ -254,13 +280,17 @@ export const SerialAssignmentInterface: React.FC<SerialAssignmentInterfaceProps>
       )}
 
       {/* Action bar - appears when serials are selected */}
-      <ActionBar
-        selectedCount={selectedSerials.size}
-        onAssignToItem={() => openAssignmentDialog('item')}
-        onAssignToLot={() => openAssignmentDialog('lot')}
-        onAssignToPackage={() => openAssignmentDialog('package')}
-        onClearSelection={handleClearSelection}
-      />
+      {selectedSerials.size > 0 && (
+        <ActionBar
+          selectedCount={selectedSerials.size}
+          onAssignToItem={assignmentMode === 'full' ? () => openAssignmentDialog('item') : undefined}
+          onAssignToLot={assignmentMode === 'full' ? () => openAssignmentDialog('lot') : undefined}
+          onAssignToPackage={assignmentMode === 'full' ? () => openAssignmentDialog('package') : undefined}
+          onAssign={assignmentMode === 'simple' ? handleSimpleAssignment : undefined}
+          onClearSelection={handleClearSelection}
+          mode={assignmentMode}
+        />
+      )}
 
       {/* Assignment dialog */}
       {!hideAssignmentDialog && (

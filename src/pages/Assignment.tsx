@@ -123,6 +123,14 @@ const Assignment: React.FC = () => {
           serials={filteredSerials}
           onAssignSerials={handleAssignSerials}
           hideAssignmentDialog={true}
+          assignmentMode="simple"
+          assignmentContext={{
+            type: targetType,
+            targetId,
+            targetName,
+            buyerPartNumber,
+            isTemporary
+          }}
         />
       </div>
     </div>

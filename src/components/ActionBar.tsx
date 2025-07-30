@@ -7,11 +7,13 @@ import { Package, Users, FileBox, X } from 'lucide-react';
 
 interface ActionBarProps {
   selectedCount: number;
-  onAssignToItem: () => void;
-  onAssignToLot: () => void;
-  onAssignToPackage: () => void;
+  onAssignToItem?: () => void;
+  onAssignToLot?: () => void;
+  onAssignToPackage?: () => void;
+  onAssign?: () => void;
   onClearSelection: () => void;
   className?: string;
+  mode?: 'full' | 'simple';
 }
 
 export const ActionBar: React.FC<ActionBarProps> = ({
@@ -19,8 +21,10 @@ export const ActionBar: React.FC<ActionBarProps> = ({
   onAssignToItem,
   onAssignToLot,
   onAssignToPackage,
+  onAssign,
   onClearSelection,
   className,
+  mode = 'full',
 }) => {
   if (selectedCount === 0) return null;
 
@@ -41,35 +45,43 @@ export const ActionBar: React.FC<ActionBarProps> = ({
 
       {/* Action buttons */}
       <div className="flex items-center gap-2">
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={onAssignToItem}
-          className="gap-2"
-        >
-          <FileBox className="w-4 h-4" />
-          Assign to Item
-        </Button>
-        
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={onAssignToLot}
-          className="gap-2"
-        >
-          <Users className="w-4 h-4" />
-          Assign to Lot
-        </Button>
-        
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={onAssignToPackage}
-          className="gap-2"
-        >
-          <Package className="w-4 h-4" />
-          Assign to Package
-        </Button>
+        {mode === 'simple' ? (
+          <Button size="sm" onClick={onAssign} className="gap-2">
+            Assign
+          </Button>
+        ) : (
+          <>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={onAssignToItem}
+              className="gap-2"
+            >
+              <FileBox className="w-4 h-4" />
+              Assign to Item
+            </Button>
+            
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={onAssignToLot}
+              className="gap-2"
+            >
+              <Users className="w-4 h-4" />
+              Assign to Lot
+            </Button>
+            
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={onAssignToPackage}
+              className="gap-2"
+            >
+              <Package className="w-4 h-4" />
+              Assign to Package
+            </Button>
+          </>
+        )}
       </div>
 
       {/* Clear selection */}
