@@ -11,7 +11,6 @@ interface SerialCardProps {
   onSelect: (serialId: string, event: React.MouseEvent) => void;
   onShowInfo: (serial: Serial) => void;
   onLinkChild: (serial: Serial) => void;
-  onSetChildComponents: (serial: Serial) => void;
   className?: string;
 }
 
@@ -28,7 +27,6 @@ export const SerialCard: React.FC<SerialCardProps> = ({
   onSelect,
   onShowInfo,
   onLinkChild,
-  onSetChildComponents,
   className,
 }) => {
   const handleClick = (event: React.MouseEvent) => {
@@ -45,10 +43,6 @@ export const SerialCard: React.FC<SerialCardProps> = ({
     onLinkChild(serial);
   };
 
-  const handleSetChildComponentsClick = (event: React.MouseEvent) => {
-    event.stopPropagation();
-    onSetChildComponents(serial);
-  };
 
   const statusInfo = statusConfig[serial.status];
 
@@ -131,15 +125,6 @@ export const SerialCard: React.FC<SerialCardProps> = ({
           title="Link child serials"
         >
           <Link2 className="w-3 h-3" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleSetChildComponentsClick}
-          className="h-6 w-6 p-0"
-          title="Set child components"
-        >
-          <Settings className="w-3 h-3" />
         </Button>
       </div>
     </div>

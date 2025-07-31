@@ -16,7 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import { Search, CheckSquare, Square, Plus } from 'lucide-react';
+import { Search, CheckSquare, Square, Plus, Upload, Settings } from 'lucide-react';
 
 interface SerialAssignmentInterfaceProps {
   serials: Serial[];
@@ -76,6 +76,7 @@ export const SerialAssignmentInterface: React.FC<SerialAssignmentInterfaceProps>
   const [createDialog, setCreateDialog] = useState(false);
   const [bulkCreateDialog, setBulkCreateDialog] = useState(false);
   const [importDialog, setImportDialog] = useState(false);
+  const [selectedSerialForChildComponents, setSelectedSerialForChildComponents] = useState<Serial | null>(null);
 
   // Filter and search serials
   const filteredSerials = useMemo(() => {
@@ -212,9 +213,15 @@ export const SerialAssignmentInterface: React.FC<SerialAssignmentInterfaceProps>
     setLinkDialog({ open: true, serial });
   }, []);
 
-  const handleSetChildComponents = useCallback((serial: Serial) => {
-    setSetChildComponentDialog({ open: true, serial });
-  }, []);
+  const handleSetChildComponents = useCallback(() => {
+    if (selectedSerials.size === 1) {
+      const serialId = Array.from(selectedSerials)[0];
+      const serial = serials.find(s => s.id === serialId);
+      if (serial) {
+        setSetChildComponentDialog({ open: true, serial });
+      }
+    }
+  }, [selectedSerials, serials]);
 
   const handleChildComponentsSet = useCallback((serialId: string, childComponents: Array<{buyerPartNumber: string; quantity: number}>) => {
     onSetChildComponents?.(serialId, childComponents);
@@ -299,8 +306,19 @@ export const SerialAssignmentInterface: React.FC<SerialAssignmentInterfaceProps>
                   onClick={() => setImportDialog(true)}
                   disabled={!onImportCSV}
                 >
-                  <Plus className="w-4 h-4" />
+                  <Upload className="w-4 h-4" />
                   Import CSV
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleSetChildComponents}
+                  disabled={selectedSerials.size !== 1}
+                  className="gap-2"
+                  title={selectedSerials.size !== 1 ? "Select exactly one serial to set child components" : "Set child components"}
+                >
+                  <Settings className="w-4 h-4" />
+                  Set Child Components
                 </Button>
               </div>
             </div>
@@ -373,7 +391,6 @@ export const SerialAssignmentInterface: React.FC<SerialAssignmentInterfaceProps>
             onSelect={handleSerialSelect}
             onShowInfo={handleShowInfo}
             onLinkChild={handleLinkChild}
-            onSetChildComponents={handleSetChildComponents}
             className="animate-in fade-in-0 duration-200"
           />
         ))}
