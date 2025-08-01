@@ -352,7 +352,7 @@ export const SerialAssignmentInterface: React.FC<SerialAssignmentInterfaceProps>
                   variant="outline" 
                   className="gap-2"
                   onClick={() => setCreateDialog(true)}
-                  disabled={!onCreateSerial}
+                  disabled={false}
                 >
                   <Plus className="w-4 h-4" />
                   Create Serial
@@ -362,7 +362,7 @@ export const SerialAssignmentInterface: React.FC<SerialAssignmentInterfaceProps>
                   variant="outline" 
                   className="gap-2"
                   onClick={() => setBulkCreateDialog(true)}
-                  disabled={!onBulkCreate}
+                  disabled={false}
                 >
                   <Plus className="w-4 h-4" />
                   Bulk Create
@@ -372,7 +372,7 @@ export const SerialAssignmentInterface: React.FC<SerialAssignmentInterfaceProps>
                   variant="outline" 
                   className="gap-2"
                   onClick={() => setImportDialog(true)}
-                  disabled={!onImportCSV}
+                  disabled={false}
                 >
                   <Upload className="w-4 h-4" />
                   Import CSV
@@ -381,7 +381,7 @@ export const SerialAssignmentInterface: React.FC<SerialAssignmentInterfaceProps>
                   size="sm"
                   variant="outline"
                   onClick={handleSetChildComponents}
-                  disabled={selectedSerials.size !== 1}
+                  disabled={false}
                   className="gap-2"
                   title={selectedSerials.size !== 1 ? "Select exactly one serial to set child components" : "Set child components"}
                 >

@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { useGlobalState } from '@/contexts/GlobalStateContext';
 import { 
   FileBox, 
   Container, 
@@ -31,12 +32,16 @@ export const ASNHierarchyView: React.FC<ASNHierarchyViewProps> = ({
   className,
 }) => {
   const { toast } = useToast();
+  const { getAllSerials, getAssignedSerials } = useGlobalState();
   const [assignmentDialog, setAssignmentDialog] = useState<{
     open: boolean;
     context: AssignmentContext | null;
   }>({ open: false, context: null });
 
-  // Calculate summary statistics
+  // Get real data from global state
+  const allSerials = getAllSerials();
+  
+  // Calculate summary statistics from global state
   const totalItems = hierarchy.items.length;
   const totalLots = hierarchy.items.reduce((sum, item) => sum + item.lots.length, 0);
   const totalPackingUnits = hierarchy.packingStructure.reduce((sum, container) => {
@@ -46,9 +51,40 @@ export const ASNHierarchyView: React.FC<ASNHierarchyViewProps> = ({
     return sum + countUnits(container);
   }, 0);
   
-  const totalSerials = serials.length;
-  const assignedSerials = serials.filter(s => s.status !== 'unassigned').length;
+  const totalSerials = allSerials.length;
+  const assignedSerials = allSerials.filter(s => s.status !== 'unassigned').length;
   const assignmentRate = totalSerials > 0 ? (assignedSerials / totalSerials) * 100 : 0;
+
+  // Calculate actual assigned counts for items and lots from global state
+  const updatedHierarchy = {
+    ...hierarchy,
+    items: hierarchy.items.map(item => ({
+      ...item,
+      assignedSerials: getAssignedSerials(item.id, 'item').length,
+      totalSerials: allSerials.filter(s => s.buyerPartNumber === item.buyerPartNumber).length,
+      lots: item.lots.map(lot => ({
+        ...lot,
+        assignedSerials: getAssignedSerials(lot.id, 'lot').length,
+        totalSerials: allSerials.filter(s => s.buyerPartNumber === lot.buyerPartNumber).length,
+      }))
+    })),
+    packingStructure: hierarchy.packingStructure.map(unit => ({
+      ...unit,
+      assignedSerials: getAssignedSerials(unit.id, 'package').length,
+      // For packing, total serials can be estimated from available serials
+      totalSerials: Math.max(unit.totalSerials, getAssignedSerials(unit.id, 'package').length),
+      children: unit.children.map(child => ({
+        ...child,
+        assignedSerials: getAssignedSerials(child.id, 'package').length,
+        totalSerials: Math.max(child.totalSerials, getAssignedSerials(child.id, 'package').length),
+        children: child.children.map(grandchild => ({
+          ...grandchild,
+          assignedSerials: getAssignedSerials(grandchild.id, 'package').length,
+          totalSerials: Math.max(grandchild.totalSerials, getAssignedSerials(grandchild.id, 'package').length),
+        }))
+      }))
+    }))
+  };
 
   const handleAssignmentRequest = (context: AssignmentContext) => {
     // Navigate to assignment page with context
@@ -136,20 +172,20 @@ export const ASNHierarchyView: React.FC<ASNHierarchyViewProps> = ({
           <TabsTrigger value="packing" className="gap-2">
             <Container className="w-4 h-4" />
             Packing Structure
-            <Badge variant="secondary">{hierarchy.packingStructure.length}</Badge>
+            <Badge variant="secondary">{updatedHierarchy.packingStructure.length}</Badge>
           </TabsTrigger>
         </TabsList>
         
         <TabsContent value="items" className="space-y-4 mt-6">
           <div className="space-y-4">
-            {hierarchy.items.map((item) => (
+            {updatedHierarchy.items.map((item) => (
               <ASNItemNode
                 key={item.id}
                 item={item}
                 onAssignSerials={handleAssignmentRequest}
               />
             ))}
-            {hierarchy.items.length === 0 && (
+            {updatedHierarchy.items.length === 0 && (
               <Card>
                 <CardContent className="p-8 text-center text-muted-foreground">
                   No items found in ASN hierarchy
@@ -161,14 +197,14 @@ export const ASNHierarchyView: React.FC<ASNHierarchyViewProps> = ({
         
         <TabsContent value="packing" className="space-y-4 mt-6">
           <div className="space-y-4">
-            {hierarchy.packingStructure.map((container) => (
+            {updatedHierarchy.packingStructure.map((container) => (
               <PackingNode
                 key={container.id}
                 unit={container}
                 onAssignSerials={handleAssignmentRequest}
               />
             ))}
-            {hierarchy.packingStructure.length === 0 && (
+            {updatedHierarchy.packingStructure.length === 0 && (
               <Card>
                 <CardContent className="p-8 text-center text-muted-foreground">
                   No packing structure defined

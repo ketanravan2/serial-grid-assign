@@ -3,6 +3,7 @@ import { ASNHierarchyView } from '@/components/ASNHierarchyView';
 import { SerialAssignmentInterface } from '@/components/SerialAssignmentInterface';
 import { IndividualAssignment } from '@/components/IndividualAssignment';
 import { useAppState } from '@/contexts/AppStateContext';
+import { useGlobalState } from '@/contexts/GlobalStateContext';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,9 +11,12 @@ import { TreePine, Grid3X3, BarChart3, Target } from 'lucide-react';
 
 const ASN: React.FC = () => {
   const { serials, asnHierarchy, assignSerials } = useAppState();
+  const { getAllSerials } = useGlobalState();
 
-  const assignedCount = serials.filter(s => s.status !== 'unassigned').length;
-  const assignmentRate = serials.length > 0 ? (assignedCount / serials.length) * 100 : 0;
+  // Use global state data for calculations
+  const allSerials = getAllSerials();
+  const assignedCount = allSerials.filter(s => s.status !== 'unassigned').length;
+  const assignmentRate = allSerials.length > 0 ? (assignedCount / allSerials.length) * 100 : 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -25,7 +29,7 @@ const ASN: React.FC = () => {
               Advanced Shipping Notice (ASN) Management
             </CardTitle>
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <span>{serials.length} total serials</span>
+              <span>{allSerials.length} total serials</span>
               <span>•</span>
               <span>{assignedCount} assigned ({assignmentRate.toFixed(1)}%)</span>
               <span>•</span>
@@ -54,14 +58,14 @@ const ASN: React.FC = () => {
           <TabsContent value="hierarchy" className="mt-6">
             <ASNHierarchyView
               hierarchy={asnHierarchy}
-              serials={serials}
+              serials={allSerials}
               onAssignSerials={assignSerials}
             />
           </TabsContent>
           
           <TabsContent value="serials" className="mt-6">
             <SerialAssignmentInterface
-              serials={serials}
+              serials={allSerials}
               onAssignSerials={assignSerials}
             />
           </TabsContent>
