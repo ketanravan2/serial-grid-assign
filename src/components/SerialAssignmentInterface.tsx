@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
+import { useGlobalState } from '@/contexts/GlobalStateContext';
 import { Serial } from '@/types/serial';
 import { SerialCard } from './SerialCard';
 import { ActionBar } from './ActionBar';
@@ -78,19 +79,71 @@ export const SerialAssignmentInterface: React.FC<SerialAssignmentInterfaceProps>
   const [importDialog, setImportDialog] = useState(false);
   const [selectedSerialForChildComponents, setSelectedSerialForChildComponents] = useState<Serial | null>(null);
 
+  // Import useGlobalState hook
+  const { asnHierarchy, checkOverassignment } = useGlobalState?.() || {};
+
+  // Status options based on assignment mode
+  const statusOptions = useMemo(() => {
+    if (assignmentMode === 'simple' && assignmentContext) {
+      return [
+        { value: 'unassigned', label: 'Unassigned' },
+        { value: 'assigned', label: 'Assigned' }
+      ];
+    }
+    return [
+      { value: 'all', label: 'All Status' },
+      { value: 'unassigned', label: 'Unassigned' },
+      { value: 'assigned', label: 'Assigned' },
+      { value: 'reserved', label: 'Reserved' },
+    ];
+  }, [assignmentMode, assignmentContext]);
+
   // Filter and search serials
   const filteredSerials = useMemo(() => {
-    return serials.filter((serial) => {
+    let filtered = serials;
+    
+    // In assignment mode, filter by assignment context
+    if (assignmentMode === 'simple' && assignmentContext) {
+      if (statusFilter === 'assigned') {
+        // Show serials assigned to this specific node
+        filtered = filtered.filter(serial => 
+          serial.assignedTo === assignmentContext.targetId && 
+          serial.assignedToType === assignmentContext.type
+        );
+      } else if (statusFilter === 'unassigned') {
+        // Show unassigned serials + serials assigned to parent (if this is a child node)
+        filtered = filtered.filter(serial => {
+          if (serial.status === 'unassigned') return true;
+          
+          // If this is a lot assignment, include serials assigned to the parent item
+          if (assignmentContext.type === 'lot' && asnHierarchy) {
+            // Find the parent item for this lot
+            const parentItem = asnHierarchy.items.find(item => 
+              item.lots.some(lot => lot.id === assignmentContext.targetId)
+            );
+            return serial.assignedTo === parentItem?.id && serial.assignedToType === 'item';
+          }
+          
+          return false;
+        });
+      }
+    } else {
+      // Filter by status for full mode
+      if (statusFilter !== 'all') {
+        filtered = filtered.filter(serial => serial.status === statusFilter);
+      }
+    }
+
+    // Apply search filter
+    return filtered.filter((serial) => {
       const matchesSearch = 
         serial.serialNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
         serial.buyerPartNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         false;
       
-      const matchesStatus = statusFilter === 'all' || serial.status === statusFilter;
-      
-      return matchesSearch && matchesStatus;
+      return matchesSearch;
     });
-  }, [serials, searchQuery, statusFilter]);
+  }, [serials, statusFilter, searchQuery, assignmentMode, assignmentContext, asnHierarchy]);
 
   // Selection handlers
   const handleSerialSelect = useCallback((serialId: string, event: React.MouseEvent) => {
@@ -168,6 +221,21 @@ export const SerialAssignmentInterface: React.FC<SerialAssignmentInterfaceProps>
   const handleSimpleAssignment = useCallback(() => {
     if (selectedSerials.size === 0 || !assignmentContext) return;
     
+    // Check for overassignment warning
+    if (checkOverassignment && assignmentContext.targetId) {
+      const targetType = assignmentContext.type === 'pack' ? 'package' : assignmentContext.type;
+      const wouldOverassign = checkOverassignment(assignmentContext.targetId, targetType, selectedSerials.size);
+      
+      if (wouldOverassign) {
+        toast({
+          title: "Warning: Overassignment",
+          description: `Assigning ${selectedSerials.size} serials would exceed the capacity for this ${assignmentContext.type}.`,
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+    
     const targetType = assignmentContext.type === 'pack' ? 'package' : assignmentContext.type;
     const serialIds = Array.from(selectedSerials);
     onAssignSerials(serialIds, assignmentContext.targetId, targetType, assignmentContext.isTemporary, assignmentContext.targetName);
@@ -179,7 +247,7 @@ export const SerialAssignmentInterface: React.FC<SerialAssignmentInterfaceProps>
     
     setSelectedSerials(new Set());
     setLastSelectedIndex(null);
-  }, [selectedSerials, assignmentContext, onAssignSerials, toast]);
+  }, [selectedSerials, assignmentContext, onAssignSerials, toast, checkOverassignment]);
 
   const handleUnassignment = useCallback(() => {
     if (selectedSerials.size === 0) return;
@@ -341,11 +409,11 @@ export const SerialAssignmentInterface: React.FC<SerialAssignmentInterfaceProps>
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="unassigned">Unassigned</SelectItem>
-                <SelectItem value="assigned">Assigned</SelectItem>
-                <SelectItem value="reserved">Reserved</SelectItem>
-                <SelectItem value="shipped">Shipped</SelectItem>
+                {statusOptions.map(option => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

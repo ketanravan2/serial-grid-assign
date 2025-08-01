@@ -13,6 +13,7 @@ import {
   Package2,
   Plus 
 } from 'lucide-react';
+import { useGlobalState } from '@/contexts/GlobalStateContext';
 import { cn } from '@/lib/utils';
 
 interface PackingNodeProps {
@@ -49,9 +50,14 @@ export const PackingNode: React.FC<PackingNodeProps> = ({
   className 
 }) => {
   const [isExpanded, setIsExpanded] = useState(true);
+  const { getAssignedSerials } = useGlobalState();
   
   const hasChildren = unit.children.length > 0;
   const assignmentProgress = unit.totalSerials > 0 ? (unit.assignedSerials / unit.totalSerials) * 100 : 0;
+  
+  // Get assigned serials for this package
+  const assignedSerials = getAssignedSerials(unit.id, 'package');
+  const assignedSerialsPreview = assignedSerials.slice(0, 3);
   
   const handlePackAssignment = () => {
     const context: AssignmentContext = {
@@ -87,18 +93,26 @@ export const PackingNode: React.FC<PackingNodeProps> = ({
               </div>
             </CollapsibleTrigger>
             
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-xs">
-                {unit.assignedSerials}/{unit.totalSerials} packed
-              </Badge>
-              <Button
-                size="sm"
-                onClick={handlePackAssignment}
-                className="gap-1"
-              >
-                <Plus className="w-3 h-3" />
-                Assign
-              </Button>
+            <div className="flex flex-col items-end gap-1">
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="text-xs">
+                  {unit.assignedSerials}/{unit.totalSerials} packed
+                </Badge>
+                <Button
+                  size="sm"
+                  onClick={handlePackAssignment}
+                  className="gap-1"
+                >
+                  <Plus className="w-3 h-3" />
+                  Manage Serials
+                </Button>
+              </div>
+              {assignedSerials.length > 0 && (
+                <div className="text-xs text-muted-foreground">
+                  {assignedSerialsPreview.map(s => s.serialNumber).join(', ')}
+                  {assignedSerials.length > 3 && ` +${assignedSerials.length - 3} more`}
+                </div>
+              )}
             </div>
           </div>
 

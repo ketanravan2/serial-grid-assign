@@ -13,6 +13,7 @@ import {
   AlertTriangle,
   Plus 
 } from 'lucide-react';
+import { useGlobalState } from '@/contexts/GlobalStateContext';
 import { cn } from '@/lib/utils';
 
 interface ASNItemNodeProps {
@@ -27,9 +28,14 @@ export const ASNItemNode: React.FC<ASNItemNodeProps> = ({
   className 
 }) => {
   const [isExpanded, setIsExpanded] = useState(item.lots.length > 0);
+  const { getAssignedSerials } = useGlobalState();
   
   const hasLots = item.lots.length > 0;
   const assignmentProgress = item.totalSerials > 0 ? (item.assignedSerials / item.totalSerials) * 100 : 0;
+  
+  // Get assigned serials for this item
+  const assignedSerials = getAssignedSerials(item.id, 'item');
+  const assignedSerialsPreview = assignedSerials.slice(0, 3);
   
   const handleItemAssignment = () => {
     const context: AssignmentContext = {
@@ -77,9 +83,17 @@ export const ASNItemNode: React.FC<ASNItemNodeProps> = ({
             </CollapsibleTrigger>
             
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-xs">
-                {item.assignedSerials}/{item.totalSerials} assigned
-              </Badge>
+              <div className="flex flex-col items-end gap-1">
+                <Badge variant="outline" className="text-xs">
+                  {item.assignedSerials}/{item.totalSerials} assigned
+                </Badge>
+                {assignedSerials.length > 0 && (
+                  <div className="text-xs text-muted-foreground">
+                    {assignedSerialsPreview.map(s => s.serialNumber).join(', ')}
+                    {assignedSerials.length > 3 && ` +${assignedSerials.length - 3} more`}
+                  </div>
+                )}
+              </div>
               <Button
                 size="sm"
                 variant={hasLots ? "outline" : "default"}
@@ -128,18 +142,30 @@ export const ASNItemNode: React.FC<ASNItemNodeProps> = ({
                           </div>
                         </div>
                         
-                        <div className="flex items-center gap-2">
-                          <Badge variant="secondary" className="text-xs">
-                            {lot.assignedSerials}/{lot.totalSerials}
-                          </Badge>
-                          <Button
-                            size="sm"
-                            onClick={() => handleLotAssignment(lot)}
-                            className="gap-1"
-                          >
-                            <Plus className="w-3 h-3" />
-                            Manage Serials
-                          </Button>
+                        <div className="flex flex-col items-end gap-1">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="secondary" className="text-xs">
+                              {lot.assignedSerials}/{lot.totalSerials}
+                            </Badge>
+                            <Button
+                              size="sm"
+                              onClick={() => handleLotAssignment(lot)}
+                              className="gap-1"
+                            >
+                              <Plus className="w-3 h-3" />
+                              Manage Serials
+                            </Button>
+                          </div>
+                          {(() => {
+                            const lotAssignedSerials = getAssignedSerials(lot.id, 'lot');
+                            const lotSerialsPreview = lotAssignedSerials.slice(0, 3);
+                            return lotAssignedSerials.length > 0 && (
+                              <div className="text-xs text-muted-foreground">
+                                {lotSerialsPreview.map(s => s.serialNumber).join(', ')}
+                                {lotAssignedSerials.length > 3 && ` +${lotAssignedSerials.length - 3} more`}
+                              </div>
+                            );
+                          })()}
                         </div>
                       </div>
                       

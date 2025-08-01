@@ -21,32 +21,15 @@ const Assignment: React.FC = () => {
 
   // Filter serials based on context
   const filteredSerials = useMemo(() => {
-    console.log('Assignment filtering:', { 
-      totalSerials: serials.length, 
-      buyerPartNumber, 
-      targetType,
-      serialSample: serials.slice(0, 3)
-    });
-    
     let filtered = serials;
 
     // Filter by buyer part number if specified
     if (buyerPartNumber) {
       filtered = filtered.filter(serial => serial.buyerPartNumber === buyerPartNumber);
-      console.log(`Filtered by buyer part number ${buyerPartNumber}:`, filtered.length);
     }
 
-    // Filter by packing context - serials should match items in the package
-    if (targetType === 'pack') {
-      // For packing assignments, show all unassigned serials
-      // In a real app, this would be filtered based on items in the package
-      filtered = filtered.filter(serial => serial.status === 'unassigned');
-      console.log('Filtered for packing (unassigned only):', filtered.length);
-    }
-
-    console.log('Final filtered serials:', filtered.length);
     return filtered;
-  }, [serials, buyerPartNumber, targetType]);
+  }, [serials, buyerPartNumber]);
 
   const getIcon = () => {
     switch (targetType) {
