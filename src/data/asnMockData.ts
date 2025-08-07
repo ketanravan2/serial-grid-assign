@@ -5,7 +5,6 @@ export const mockASNItems: ASNItem[] = [
   {
     id: 'item-001',
     name: 'High-Performance CPU',
-    partNumber: 'CPU-X1000',
     buyerPartNumber: 'BPN-CPU-001',
     description: 'Advanced 8-core processor for enterprise systems',
     totalSerials: 20,
@@ -36,7 +35,6 @@ export const mockASNItems: ASNItem[] = [
   {
     id: 'item-002',
     name: 'Memory Module DDR5',
-    partNumber: 'MEM-DDR5-32GB',
     buyerPartNumber: 'BPN-MEM-002',
     description: '32GB DDR5 ECC memory module',
     totalSerials: 15,
@@ -57,7 +55,6 @@ export const mockASNItems: ASNItem[] = [
   {
     id: 'item-003',
     name: 'Graphics Card RTX',
-    partNumber: 'GPU-RTX-4090',
     buyerPartNumber: 'BPN-GPU-003',
     description: 'Professional graphics card for AI workloads',
     totalSerials: 8,
@@ -67,7 +64,6 @@ export const mockASNItems: ASNItem[] = [
   {
     id: 'item-004',
     name: 'Network Interface Card',
-    partNumber: 'NIC-10GB-ETH',
     buyerPartNumber: 'BPN-NIC-004',
     description: '10Gb Ethernet network interface card',
     totalSerials: 25,

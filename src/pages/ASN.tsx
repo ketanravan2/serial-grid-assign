@@ -2,7 +2,7 @@ import React from 'react';
 import { ASNHierarchyView } from '@/components/ASNHierarchyView';
 import { SerialAssignmentInterface } from '@/components/SerialAssignmentInterface';
 import { IndividualAssignment } from '@/components/IndividualAssignment';
-import { useAppState } from '@/contexts/AppStateContext';
+
 import { useGlobalState } from '@/contexts/GlobalStateContext';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -10,8 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TreePine, Grid3X3, BarChart3, Target } from 'lucide-react';
 
 const ASN: React.FC = () => {
-  const { serials, asnHierarchy, assignSerials } = useAppState();
-  const { getAllSerials } = useGlobalState();
+  const { getAllSerials, asnHierarchy, assignSerials } = useGlobalState();
 
   // Use global state data for calculations
   const allSerials = getAllSerials();

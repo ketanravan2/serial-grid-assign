@@ -29,7 +29,6 @@ export interface Serial {
 
 export interface PartNumber {
   id: string;
-  partNumber: string;
   buyerPartNumber: string;
   name: string;
   description?: string;
@@ -38,7 +37,7 @@ export interface PartNumber {
 export interface Item {
   id: string;
   name: string;
-  partNumber: string;
+  buyerPartNumber: string;
   description?: string;
 }
 

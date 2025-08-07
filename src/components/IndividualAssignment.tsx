@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useAppState } from '@/contexts/AppStateContext';
+import { useGlobalState } from '@/contexts/GlobalStateContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -9,7 +9,9 @@ import { Package, Box, Container, Plus, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export const IndividualAssignment: React.FC = () => {
-  const { serials, asnHierarchy, assignSerials, createSerial, bulkCreateSerials, importSerialsFromCSV, linkChildSerials, setChildComponents, partNumbers } = useAppState();
+  const { getAllSerials, asnHierarchy, assignSerials, createSerial, bulkCreateSerials, importSerialsFromCSV, linkChildSerials, setChildComponents, getPartNumbers } = useGlobalState();
+  const serials = getAllSerials();
+  const partNumbers = getPartNumbers();
   const { toast } = useToast();
   const [assignmentType, setAssignmentType] = useState<'items' | 'package'>('items');
   const [selectedItem, setSelectedItem] = useState<string>('');

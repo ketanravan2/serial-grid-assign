@@ -31,6 +31,7 @@ interface GlobalStateContextType {
   
   // Computed getters
   getAllSerials: () => Serial[];
+  getPartNumbers: () => PartNumber[];
   getSerialsByBuyerPartNumber: (buyerPartNumber: string) => Serial[];
   getAssignedSerials: (targetId: string, targetType: 'item' | 'lot' | 'package') => Serial[];
   
@@ -63,7 +64,6 @@ interface GlobalStateContextType {
   linkChildSerials: (parentSerialId: string, childSerialIds: string[]) => void;
   setChildComponents: (serialId: string, childComponents: ChildComponent[]) => void;
   createPartNumber: (data: {
-    partNumber: string;
     buyerPartNumber: string;
     name: string;
     description: string;
@@ -98,7 +98,6 @@ export const GlobalStateProvider: React.FC<{ children: ReactNode }> = ({ childre
       if (item.buyerPartNumber && !initialPartNumbers.some(p => p.buyerPartNumber === item.buyerPartNumber)) {
         initialPartNumbers.push({
           id: `part-${item.id}`,
-          partNumber: item.partNumber,
           buyerPartNumber: item.buyerPartNumber,
           name: item.name,
           description: item.description,
@@ -109,7 +108,6 @@ export const GlobalStateProvider: React.FC<{ children: ReactNode }> = ({ childre
         if (lot.buyerPartNumber && !initialPartNumbers.some(p => p.buyerPartNumber === lot.buyerPartNumber)) {
           initialPartNumbers.push({
             id: `part-lot-${lot.id}`,
-            partNumber: lot.buyerPartNumber,
             buyerPartNumber: lot.buyerPartNumber,
             name: `${item.name} - ${lot.number}`,
             description: lot.description,
@@ -129,6 +127,10 @@ export const GlobalStateProvider: React.FC<{ children: ReactNode }> = ({ childre
     });
     return allSerials;
   }, [stateData.serials_inventory]);
+
+  const getPartNumbers = useCallback((): PartNumber[] => {
+    return partNumbers;
+  }, [partNumbers]);
 
   const getSerialsByBuyerPartNumber = useCallback((buyerPartNumber: string): Serial[] => {
     return stateData.serials_inventory[buyerPartNumber] || [];
@@ -402,14 +404,12 @@ export const GlobalStateProvider: React.FC<{ children: ReactNode }> = ({ childre
   }, []);
 
   const createPartNumber = useCallback((data: {
-    partNumber: string;
     buyerPartNumber: string;
     name: string;
     description: string;
   }) => {
     const newPartNumber: PartNumber = {
       id: `part-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      partNumber: data.partNumber,
       buyerPartNumber: data.buyerPartNumber,
       name: data.name,
       description: data.description,
@@ -424,6 +424,7 @@ export const GlobalStateProvider: React.FC<{ children: ReactNode }> = ({ childre
       asnHierarchy,
       partNumbers,
       getAllSerials,
+      getPartNumbers,
       getSerialsByBuyerPartNumber,
       getAssignedSerials,
       createSerial,

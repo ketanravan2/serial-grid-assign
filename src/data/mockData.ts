@@ -6,7 +6,7 @@ export const mockSerials: Serial[] = [];
 export const mockItems: Item[] = Array.from({ length: 12 }, (_, i) => ({
   id: `item-${i + 1}`,
   name: `Item ${i + 1}`,
-  partNumber: `ITM-${String(i + 1).padStart(3, '0')}`,
+  buyerPartNumber: `ITM-${String(i + 1).padStart(3, '0')}`,
   description: `High-quality component for manufacturing process ${i + 1}`,
 }));
 

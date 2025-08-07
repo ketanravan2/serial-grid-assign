@@ -78,7 +78,7 @@ export const ASNItemNode: React.FC<ASNItemNodeProps> = ({
               )}
               <div className="text-left">
                 <div className="font-semibold text-sm">{item.name}</div>
-                <div className="text-xs text-muted-foreground">{item.partNumber}</div>
+                <div className="text-xs text-muted-foreground">{item.buyerPartNumber}</div>
               </div>
             </CollapsibleTrigger>
             

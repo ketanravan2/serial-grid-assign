@@ -9,7 +9,6 @@ interface CreatePartNumberDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onCreatePartNumber: (data: {
-    partNumber: string;
     buyerPartNumber: string;
     name: string;
     description: string;
@@ -21,23 +20,20 @@ export const CreatePartNumberDialog: React.FC<CreatePartNumberDialogProps> = ({
   onOpenChange,
   onCreatePartNumber,
 }) => {
-  const [partNumber, setPartNumber] = useState('');
   const [buyerPartNumber, setBuyerPartNumber] = useState('');
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
 
   const handleSubmit = () => {
-    if (!partNumber || !buyerPartNumber || !name) return;
+    if (!buyerPartNumber || !name) return;
     
     onCreatePartNumber({
-      partNumber,
       buyerPartNumber,
       name,
       description,
     });
 
     // Reset form
-    setPartNumber('');
     setBuyerPartNumber('');
     setName('');
     setDescription('');
@@ -55,16 +51,6 @@ export const CreatePartNumberDialog: React.FC<CreatePartNumberDialogProps> = ({
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="partNumber">Part Number</Label>
-            <Input
-              id="partNumber"
-              value={partNumber}
-              onChange={(e) => setPartNumber(e.target.value)}
-              placeholder="e.g., CPU-X1000"
-            />
-          </div>
-
           <div className="space-y-2">
             <Label htmlFor="buyerPartNumber">Buyer Part Number</Label>
             <Input
@@ -103,7 +89,7 @@ export const CreatePartNumberDialog: React.FC<CreatePartNumberDialogProps> = ({
           </Button>
           <Button 
             onClick={handleSubmit}
-            disabled={!partNumber || !buyerPartNumber || !name}
+            disabled={!buyerPartNumber || !name}
           >
             Create Part Number
           </Button>

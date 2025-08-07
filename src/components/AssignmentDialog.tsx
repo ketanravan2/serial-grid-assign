@@ -42,7 +42,7 @@ export const AssignmentDialog: React.FC<AssignmentDialogProps> = ({
           id: item.id,
           type: 'item' as const,
           name: item.name,
-          details: item.partNumber,
+          details: item.buyerPartNumber,
         }));
       case 'lot':
         return mockLots.map(lot => ({

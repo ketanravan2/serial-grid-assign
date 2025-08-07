@@ -4,14 +4,13 @@ import { Link } from "react-router-dom";
 import { Package, FileBox, Users, TreePine, Grid3X3, Plus } from "lucide-react";
 import { useState } from "react";
 import { CreatePartNumberDialog } from "@/components/CreatePartNumberDialog";
-import { useAppState } from "@/contexts/AppStateContext";
+import { useGlobalState } from "@/contexts/GlobalStateContext";
 
 const Index = () => {
-  const { createPartNumber } = useAppState();
+  const { createPartNumber } = useGlobalState();
   const [createPartDialog, setCreatePartDialog] = useState(false);
 
   const handleCreatePartNumber = (data: {
-    partNumber: string;
     buyerPartNumber: string;
     name: string;
     description: string;

@@ -1,7 +1,6 @@
 export interface ASNItem {
   id: string;
   name: string;
-  partNumber: string;
   buyerPartNumber: string;
   description?: string;
   lots: ASNLot[];

@@ -1,10 +1,10 @@
 import React from 'react';
 import { SerialAssignmentInterface } from '@/components/SerialAssignmentInterface';
-import { useAppState } from '@/contexts/AppStateContext';
+import { useGlobalState } from '@/contexts/GlobalStateContext';
 
 const Serials: React.FC = () => {
   const { 
-    serials, 
+    getAllSerials, 
     assignSerials, 
     createSerial, 
     bulkCreateSerials, 
@@ -12,8 +12,11 @@ const Serials: React.FC = () => {
     linkChildSerials,
     setChildComponents,
     asnHierarchy,
-    partNumbers
-  } = useAppState();
+    getPartNumbers
+  } = useGlobalState();
+
+  const serials = getAllSerials();
+  const partNumbers = getPartNumbers();
 
   // Extract available buyer part numbers from part numbers state
   const availableBuyerPartNumbers = partNumbers.map(p => p.buyerPartNumber);

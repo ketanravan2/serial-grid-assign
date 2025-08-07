@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { SerialAssignmentInterface } from '@/components/SerialAssignmentInterface';
-import { useAppState } from '@/contexts/AppStateContext';
+import { useGlobalState } from '@/contexts/GlobalStateContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Package, Box, Container } from 'lucide-react';
@@ -11,7 +11,8 @@ const Assignment: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { serials, assignSerials, asnHierarchy } = useAppState();
+  const { getAllSerials, assignSerials, asnHierarchy } = useGlobalState();
+  const serials = getAllSerials();
 
   const targetType = searchParams.get('type') as 'item' | 'lot' | 'pack';
   const targetId = searchParams.get('targetId') || '';
