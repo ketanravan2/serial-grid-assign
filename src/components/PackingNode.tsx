@@ -53,10 +53,14 @@ export const PackingNode: React.FC<PackingNodeProps> = ({
   const { getAssignedSerials } = useGlobalState();
   
   const hasChildren = unit.children.length > 0;
-  const assignmentProgress = unit.totalSerials > 0 ? (unit.assignedSerials / unit.totalSerials) * 100 : 0;
   
-  // Get assigned serials for this package
+  // Calculate real-time stats from global state
   const assignedSerials = getAssignedSerials(unit.id, 'package');
+  const actualAssignedSerials = assignedSerials.length;
+  // For packing units, we'll use a reasonable default capacity since we don't have actual inventory
+  const estimatedCapacity = unit.type === 'container' ? 100 : unit.type === 'pallet' ? 50 : 25;
+  const assignmentProgress = estimatedCapacity > 0 ? (actualAssignedSerials / estimatedCapacity) * 100 : 0;
+  
   const assignedSerialsPreview = assignedSerials.slice(0, 3);
   
   const handlePackAssignment = () => {
@@ -95,9 +99,9 @@ export const PackingNode: React.FC<PackingNodeProps> = ({
             
             <div className="flex flex-col items-end gap-1">
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-xs">
-                  {unit.assignedSerials}/{unit.totalSerials} packed
-                </Badge>
+              <Badge variant="outline" className="text-xs">
+                {actualAssignedSerials} assigned
+              </Badge>
                 <Button
                   size="sm"
                   onClick={handlePackAssignment}

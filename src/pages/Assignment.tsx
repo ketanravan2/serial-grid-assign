@@ -11,14 +11,18 @@ const Assignment: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { getAllSerials, assignSerials, asnHierarchy } = useGlobalState();
+  const { getAllSerials, assignSerials, asnHierarchy, getPartNumbers } = useGlobalState();
   const serials = getAllSerials();
+  const partNumbers = getPartNumbers();
 
   const targetType = searchParams.get('type') as 'item' | 'lot' | 'pack';
   const targetId = searchParams.get('targetId') || '';
   const targetName = searchParams.get('targetName') || '';
   const buyerPartNumber = searchParams.get('buyerPartNumber');
   const isTemporary = searchParams.get('temporary') === 'true';
+
+  // Extract available buyer part numbers from part numbers state
+  const availableBuyerPartNumbers = partNumbers.map(p => p.buyerPartNumber);
 
   // Filter serials based on context
   const filteredSerials = useMemo(() => {
@@ -106,6 +110,7 @@ const Assignment: React.FC = () => {
         <SerialAssignmentInterface
           serials={filteredSerials}
           onAssignSerials={handleAssignSerials}
+          availableBuyerPartNumbers={availableBuyerPartNumbers}
           hideAssignmentDialog={true}
           assignmentMode="simple"
           assignmentContext={{

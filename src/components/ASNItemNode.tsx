@@ -28,13 +28,17 @@ export const ASNItemNode: React.FC<ASNItemNodeProps> = ({
   className 
 }) => {
   const [isExpanded, setIsExpanded] = useState(item.lots.length > 0);
-  const { getAssignedSerials } = useGlobalState();
+  const { getAssignedSerials, getSerialsByBuyerPartNumber } = useGlobalState();
   
   const hasLots = item.lots.length > 0;
-  const assignmentProgress = item.totalSerials > 0 ? (item.assignedSerials / item.totalSerials) * 100 : 0;
   
-  // Get assigned serials for this item
+  // Calculate real-time stats from global state
+  const allSerialsForBuyerPart = getSerialsByBuyerPartNumber(item.buyerPartNumber);
+  const actualTotalSerials = allSerialsForBuyerPart.length;
   const assignedSerials = getAssignedSerials(item.id, 'item');
+  const actualAssignedSerials = assignedSerials.length;
+  const assignmentProgress = actualTotalSerials > 0 ? (actualAssignedSerials / actualTotalSerials) * 100 : 0;
+  
   const assignedSerialsPreview = assignedSerials.slice(0, 3);
   
   const handleItemAssignment = () => {
@@ -85,7 +89,7 @@ export const ASNItemNode: React.FC<ASNItemNodeProps> = ({
             <div className="flex items-center gap-2">
               <div className="flex flex-col items-end gap-1">
                 <Badge variant="outline" className="text-xs">
-                  {item.assignedSerials}/{item.totalSerials} assigned
+                  {actualAssignedSerials}/{actualTotalSerials} assigned
                 </Badge>
                 {assignedSerials.length > 0 && (
                   <div className="text-xs text-muted-foreground">
@@ -126,7 +130,12 @@ export const ASNItemNode: React.FC<ASNItemNodeProps> = ({
           {hasLots && (
             <CollapsibleContent className="space-y-2 ml-6 border-l-2 border-muted pl-4">
               {item.lots.map((lot) => {
-                const lotProgress = lot.totalSerials > 0 ? (lot.assignedSerials / lot.totalSerials) * 100 : 0;
+                // Calculate real-time lot stats from global state
+                const lotAssignedSerials = getAssignedSerials(lot.id, 'lot');
+                const lotSerialsForBuyerPart = getSerialsByBuyerPartNumber(lot.buyerPartNumber);
+                const actualLotTotalSerials = lotSerialsForBuyerPart.length;
+                const actualLotAssignedSerials = lotAssignedSerials.length;
+                const lotProgress = actualLotTotalSerials > 0 ? (actualLotAssignedSerials / actualLotTotalSerials) * 100 : 0;
                 
                 return (
                   <Card key={lot.id} className="border-dashed">
@@ -137,7 +146,7 @@ export const ASNItemNode: React.FC<ASNItemNodeProps> = ({
                           <div>
                             <div className="font-medium text-sm">{lot.number}</div>
                             <div className="text-xs text-muted-foreground">
-                              {lot.serialCount} serials in lot
+                              {actualLotTotalSerials} serials available
                             </div>
                           </div>
                         </div>
@@ -145,7 +154,7 @@ export const ASNItemNode: React.FC<ASNItemNodeProps> = ({
                         <div className="flex flex-col items-end gap-1">
                           <div className="flex items-center gap-2">
                             <Badge variant="secondary" className="text-xs">
-                              {lot.assignedSerials}/{lot.totalSerials}
+                              {actualLotAssignedSerials}/{actualLotTotalSerials}
                             </Badge>
                             <Button
                               size="sm"
@@ -157,7 +166,6 @@ export const ASNItemNode: React.FC<ASNItemNodeProps> = ({
                             </Button>
                           </div>
                           {(() => {
-                            const lotAssignedSerials = getAssignedSerials(lot.id, 'lot');
                             const lotSerialsPreview = lotAssignedSerials.slice(0, 3);
                             return lotAssignedSerials.length > 0 && (
                               <div className="text-xs text-muted-foreground">

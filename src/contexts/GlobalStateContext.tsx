@@ -418,7 +418,6 @@ export const GlobalStateProvider: React.FC<{ children: ReactNode }> = ({ childre
     setPartNumbers(prevPartNumbers => [...prevPartNumbers, newPartNumber]);
   }, []);
 
-  console.log('GlobalStateProvider rendering, stateData:', stateData);
   return (
     <GlobalStateContext.Provider value={{
       stateData,
@@ -444,9 +443,7 @@ export const GlobalStateProvider: React.FC<{ children: ReactNode }> = ({ childre
 
 export const useGlobalState = () => {
   const context = useContext(GlobalStateContext);
-  console.log('useGlobalState called, context:', context);
   if (context === undefined) {
-    console.error('GlobalStateContext is undefined! Provider not found in component tree.');
     throw new Error('useGlobalState must be used within a GlobalStateProvider');
   }
   return context;
